@@ -1,0 +1,23 @@
+{
+  "name": "phonebook-graphql",
+  "version": "1.0.0",
+  "description": "GraphQL training. Part 8 of full stack open course. Phonebook app with GraphQL",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ArtmMtvnko"
+  },
+  "keywords": [
+    "javascript",
+    "graphql"
+  ],
+  "author": "Artem Matviienko",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/server": "^4.10.5",
+    "graphql": "^16.9.0"
+  }
+}
