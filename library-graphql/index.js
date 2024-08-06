@@ -1,6 +1,5 @@
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
-const { GraphQLError } = require('graphql')
 const { v1: uuid } = require('uuid')
 
 let authors = [
@@ -111,6 +110,7 @@ const typeDefs = `
             published: Int!
             genres: [String!]!
         ): Book
+        editAuthor (name: String!, setBornTo: Int!): Author
     }
 `
 
@@ -154,6 +154,20 @@ const resolvers = {
             books = books.concat(book)
             
             return book
+        },
+        editAuthor: (root, args) => {
+            const author = authors.find(a => a.name === args.name)
+
+            if (!author) return null
+
+            const editedAuthor = {
+                ...author,
+                born: args.setBornTo
+            }
+
+            authors = authors.map(a => a.id === author.id ? editedAuthor : a)
+
+            return editedAuthor
         }
     },
     Author: {
