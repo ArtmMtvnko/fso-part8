@@ -1,0 +1,27 @@
+{
+  "name": "library-graphql",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArtmMtvnko/fso-part8.git"
+  },
+  "keywords": [
+    "javascript",
+    "graphql"
+  ],
+  "author": "Artem Matviienko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ArtmMtvnko/fso-part8/issues"
+  },
+  "homepage": "https://github.com/ArtmMtvnko/fso-part8#readme",
+  "description": "",
+  "dependencies": {
+    "@apollo/server": "^4.10.5",
+    "graphql": "^16.9.0"
+  }
+}
