@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@apollo/client": "^3.11.3",
+    "praphql": "^0.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
