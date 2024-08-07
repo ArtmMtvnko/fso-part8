@@ -1,17 +1,13 @@
 import { useState } from 'react'
 import { useField } from '../hooks/useField'
 
-const NewBook = (props) => {
+const NewBook = () => {
     const [genres, setGenres] = useState([])
 
     const [title, resetTitle] = useField('text')
     const [author, resetAuthor] = useField('text')
     const [published, resetPublished] = useField('number')
     const [genre, resetGenre] = useField('text')
-
-    if (!props.show) {
-        return null
-    }
 
     const submit = async (event) => {
         event.preventDefault()
