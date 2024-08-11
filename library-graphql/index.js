@@ -132,48 +132,50 @@ const resolvers = {
         bookCount: async () => Book.collection.countDocuments(),
         authorCount: async () => Author.collection.countDocuments(),
         allBooks: async (root, args) => {
-            const books = await Book.find({})
-            
-            if (!args) return books
+            if (!args) {
+                return Book.find({})
+            }
 
-            let filtered = books // [...books] ==> books
+            const query = {}
 
             if (args.author) {
-                filtered = filtered.filter(book => book.author === args.author)
+                const author = await Author.findOne({ name: args.author })
+                query.author = author._id
             }
 
             if (args.genre) {
-                filtered = filtered.filter(book => book.genres.includes(args.genre))
+                // If array has primary value types, it will automaticly looks for in array.
+                // So that { genres: 'comedy' } will return entrie if array ['drama', 'comedy', 'action'] has value 'comdey'
+                // Otherwise, use { genres: { $elemMatch: { name: 'some-name', age: 100 } } } syntax.
+                // For primary values use { genres: { $elemMatch: { $eq: 'comedy' } } }
+                query.genres = { $in: [args.genre] }
             }
             
-            return filtered
+            return Book.find(query).populate('author')
         },
         allAuthors: async () => Author.find({})
     },
     Mutation: {
         addBook: async (root, args) => {
-            // const author = authors.some(a => a.name === args.author)
             let author = await Author.findOne({ name: args.author })
 
             if (!author) {
                 author = new Author({ name: args.author })
                 await author.save()
-                // authors = authors.concat({ name: args.author, id: uuid() })
             }
 
-            const book = {
+            const book = new Book({
                 title: args.title,
                 published: args.published,
                 author: author._id,
-                id: uuid(),
                 genres: args.genres
-            }
-            // TODO: To check if all code that was written is works (may be a rollback has to be done, git reset/revert)
-            const newBook = new Book(book)
-            return newBook.save()
+            })
+            const createdBook = await book.save()
 
-            // books = books.concat(book)
-            // return book
+            author.books = author.books.concat(createdBook._id)
+            await author.save()
+
+            return createdBook
         },
         editAuthor: (root, args) => {
             const author = authors.find(a => a.name === args.name)
@@ -191,10 +193,7 @@ const resolvers = {
         }
     },
     Author: {
-        bookCount: (root) =>
-            books.reduce((acc, book) => {
-                return book.author === root.name ? acc + 1 : acc
-            }, 0)
+        bookCount: (root) => root.books.length
     }
 }
 
