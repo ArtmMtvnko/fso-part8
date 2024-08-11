@@ -2,7 +2,7 @@ require('dotenv').config()
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
 const { v1: uuid } = require('uuid')
-
+const { GraphQLError } = require('graphql')
 const mongoose = require('mongoose')
 const Book = require('./src/models/book')
 const Author = require('./src/models/author')
@@ -160,22 +160,38 @@ const resolvers = {
             let author = await Author.findOne({ name: args.author })
 
             if (!author) {
-                author = new Author({ name: args.author })
-                await author.save()
+                try {
+                    author = new Author({ name: args.author })
+                    await author.save()
+                } catch (error) {
+                    throw new GraphQLError('Creating an author is failed.', {
+                        code: 'BAD_USER_INPUT',
+                        invalidArgs: args.author,
+                        error
+                    })
+                }
             }
-
             const book = new Book({
                 title: args.title,
                 published: args.published,
                 author: author._id,
                 genres: args.genres
             })
-            const createdBook = await book.save()
 
-            author.books = author.books.concat(createdBook._id)
-            await author.save()
-
-            return createdBook
+            try {
+                const createdBook = await book.save()
+    
+                author.books = author.books.concat(createdBook._id)
+                await author.save()
+    
+                return createdBook
+            } catch (error) {
+                throw new GraphQLError('Creating a book is failed.', {
+                    code: 'BAD_USER_INPUT',
+                    invalidArgs: args,
+                    error
+                })
+            }
         },
         editAuthor: async (root, args) => {
             const author = await Author.findOne({ name: args.name })
