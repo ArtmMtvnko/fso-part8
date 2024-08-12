@@ -16,7 +16,7 @@ mongoose.connect(process.env.MONGODB_URI)
         console.log('error connection to MongoDB:', error.message)
     })
 
-const TRIAL_PASSWORD = 'hardcoded-for-tutorial-123'
+const TRIAL_PASSWORD = 'qwerty123'
 
 const typeDefs = `
     type User {
@@ -136,7 +136,7 @@ const resolvers = {
                 value: jwt.sign(userForToken, process.env.JWT_SECRET)
             }
         },
-        addBook: async (root, args) => {
+        addBook: async (root, args, context) => {
             if (context.currentUser === null) {
                 throw new GraphQLError('Authorization failed', {
                     code: 'UNAUTHORIZED'
@@ -144,13 +144,13 @@ const resolvers = {
             }
             
             let author = await Author.findOne({ name: args.author })
-
+            
             if (!author) {
                 try {
                     author = new Author({ name: args.author })
                     await author.save()
                 } catch (error) {
-                    throw new GraphQLError('Creating an author is failed.', {
+                    throw new GraphQLError('Creating an author is failed. Min lenght must be 4', {
                         code: 'BAD_USER_INPUT',
                         invalidArgs: args.author,
                         error
@@ -170,9 +170,9 @@ const resolvers = {
                 author.books = author.books.concat(createdBook._id)
                 await author.save()
     
-                return createdBook
+                return createdBook.populate('author')
             } catch (error) {
-                throw new GraphQLError('Creating a book is failed.', {
+                throw new GraphQLError('Creating a book is failed. Min lenght must be 5', {
                     code: 'BAD_USER_INPUT',
                     invalidArgs: args,
                     error
@@ -209,9 +209,9 @@ startStandaloneServer(server, {
     listen: { port: 4000 },
     context: async ({ req, res }) => {
         const auth = req ? req.headers.authorization : null
-        // It automaticly cuts the part 'Bearer '
-        if (auth) {
-            const decodedToken = jwt.verify(auth, process.env.JWT_SECRET)
+
+        if (auth && auth.startsWith('Bearer ')) {
+            const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET)
 
             const currentUser = await User.findById(decodedToken.id)
             return { currentUser }
