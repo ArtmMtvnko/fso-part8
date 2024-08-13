@@ -6,6 +6,7 @@ import { Link, Route, Routes } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import Notify from './components/Notify';
 import { useApolloClient } from '@apollo/client';
+import Recommendations from './components/Recommendations';
 
 const App = () => {
     const [token, setToken] = useState(localStorage.getItem('library-user-token') ?? null)
@@ -40,6 +41,9 @@ const App = () => {
                 <Link to="/newbook">
                     <button>add book</button>
                 </Link>
+                <Link to="/recommendations">
+                    <button>recommendations</button>
+                </Link>
                 <button style={{ marginLeft: 30 }} onClick={logout}>log out</button>
             </div>
 
@@ -47,6 +51,7 @@ const App = () => {
                 <Route path="/" element={<Authors />} />
                 <Route path="/books" element={<Books />} />
                 <Route path="/newbook" element={<NewBook setError={setError} />} />
+                <Route path="/recommendations" element={<Recommendations />} />
             </Routes>
         </div>
     )
