@@ -1,10 +1,18 @@
 import { useQuery } from '@apollo/client'
 import { ALL_BOOKS } from '../queries'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+
+const getVariables = (genre) => {
+    if (genre === null) return
+
+    return { genre }
+}
 
 const Books = () => {
     const [currentGenre, setCurrentGenre] = useState(null)
-    const result = useQuery(ALL_BOOKS)
+    const result = useQuery(ALL_BOOKS, {
+        variables: getVariables(currentGenre)
+    })
 
     if (result.loading) {
         return <div>loading...</div>
