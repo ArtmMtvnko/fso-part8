@@ -4,6 +4,9 @@ const Book = require('./models/book')
 const Author = require('./models/author')
 const User = require('./models/user')
 
+const { PubSub } = require('graphql-subscriptions')
+const pubsub = new PubSub()
+
 
 const resolvers = {
     Query: {
@@ -99,12 +102,16 @@ const resolvers = {
             })
 
             try {
-                const createdBook = await book.save()
+                const savedBook = await book.save()
     
-                author.books = author.books.concat(createdBook._id)
+                author.books = author.books.concat(savedBook._id)
                 await author.save()
+
+                const createdBook = await savedBook.populate('author')
+
+                pubsub.publish('BOOK_ADDED', { bookAdded: createdBook })
     
-                return createdBook.populate('author')
+                return createdBook
             } catch (error) {
                 throw new GraphQLError('Creating a book is failed. Min lenght must be 5', {
                     code: 'BAD_USER_INPUT',
@@ -127,6 +134,11 @@ const resolvers = {
             author.born = args.setBornTo
 
             return author.save()
+        }
+    },
+    Subscription: {
+        bookAdded: {
+            subscribe: () => pubsub.asyncIterator('BOOK_ADDED')
         }
     },
     Author: {
