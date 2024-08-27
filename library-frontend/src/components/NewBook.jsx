@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useField } from '../hooks/useField'
-import { useMutation } from '@apollo/client'
-import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK } from '../queries'
+import { useMutation, useSubscription } from '@apollo/client'
+import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK, BOOK_ADDED } from '../queries'
 
 const NewBook = ({ setError }) => {
     const [genres, setGenres] = useState([])
@@ -29,6 +29,7 @@ const NewBook = ({ setError }) => {
         //     })
         // }
     })
+
 
     const submit = async (event) => {
         event.preventDefault()

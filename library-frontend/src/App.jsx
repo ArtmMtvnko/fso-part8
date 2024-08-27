@@ -7,6 +7,8 @@ import LoginForm from './components/LoginForm';
 import Notify from './components/Notify';
 import { useApolloClient } from '@apollo/client';
 import Recommendations from './components/Recommendations';
+import { useSubscription } from '@apollo/client';
+import { BOOK_ADDED } from './queries';
 
 const App = () => {
     const [token, setToken] = useState(localStorage.getItem('library-user-token') ?? null)
@@ -27,6 +29,16 @@ const App = () => {
         localStorage.removeItem('library-user-token')
         client.resetStore()
     }
+
+    useSubscription(BOOK_ADDED, {
+        onComplete: () => {
+            console.log('sub is done')
+        },
+        onData: ({ data }) => {
+            console.log('I am in')
+            console.log(data)
+        }
+    })
     
     return (
         <div>

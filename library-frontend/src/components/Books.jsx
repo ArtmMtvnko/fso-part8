@@ -1,6 +1,6 @@
-import { useQuery } from '@apollo/client'
-import { ALL_BOOKS } from '../queries'
-import { useMemo, useState } from 'react'
+import { useQuery, useSubscription } from '@apollo/client'
+import { ALL_BOOKS, BOOK_ADDED } from '../queries'
+import { useState } from 'react'
 
 const getVariables = (genre) => {
     if (genre === null) return
@@ -10,6 +10,7 @@ const getVariables = (genre) => {
 
 const Books = () => {
     const [currentGenre, setCurrentGenre] = useState(null)
+    
     const result = useQuery(ALL_BOOKS, {
         variables: getVariables(currentGenre)
     })
